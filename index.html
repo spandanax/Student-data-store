@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Engineering Student Data Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar glass" aria-label="Sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M14 1.6L25.2 7.2V20.8L14 26.4L2.8 20.8V7.2L14 1.6Z"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path
+                d="M14 8.1L20.4 11.3V17.9L14 21.1L7.6 17.9V11.3L14 8.1Z"
+                fill="currentColor"
+                opacity="0.14"
+              />
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">EngiDash</div>
+            <div class="brand-subtitle">Student Management</div>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-link is-active" data-view="dashboard">
+            <span class="nav-icon" aria-hidden="true">📊</span>
+            Dashboard
+          </button>
+          <button class="nav-link" data-view="students">
+            <span class="nav-icon" aria-hidden="true">🧑‍🎓</span>
+            Students
+          </button>
+          <button class="nav-link" data-view="analytics">
+            <span class="nav-icon" aria-hidden="true">📈</span>
+            Analytics
+          </button>
+          <button class="nav-link" data-view="import-export">
+            <span class="nav-icon" aria-hidden="true">🔁</span>
+            Import/Export
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="hint" id="lastSavedHint">Autosaving to localStorage…</div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="topbar-left">
+            <div class="page-title" id="pageTitle">Dashboard</div>
+            <div class="page-subtitle">
+              Premium engineering student data dashboard
+            </div>
+          </div>
+          <div class="topbar-right">
+            <div class="search glass" role="search">
+              <span class="search-icon" aria-hidden="true">🔎</span>
+              <input
+                id="globalSearch"
+                type="search"
+                placeholder="Search by name, roll, email, skill, project…"
+                autocomplete="off"
+              />
+            </div>
+            <button class="btn btn-primary" id="openCreateBtn" type="button">
+              <span class="btn-icon" aria-hidden="true">➕</span>
+              Add Student
+            </button>
+          </div>
+        </header>
+
+        <section class="content">
+          <!-- DASHBOARD VIEW -->
+          <section
+            class="view"
+            data-view-container="dashboard"
+            aria-label="Dashboard view"
+          >
+            <div class="grid cards" id="metricsGrid">
+              <!-- populated by JS -->
+            </div>
+
+            <div class="grid two-cols" style="margin-top: 18px">
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Department Distribution</div>
+                    <div class="panel-subtitle">
+                      Students count by department
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="chart-wrap">
+                    <svg
+                      id="deptBarChart"
+                      class="chart"
+                      viewBox="0 0 640 260"
+                      preserveAspectRatio="none"
+                      aria-label="Department distribution bar chart"
+                    ></svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Attendance Analysis</div>
+                    <div class="panel-subtitle">
+                      Average attendance (radial)
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="radial-wrap">
+                    <svg
+                      id="attendanceRadial"
+                      class="radial"
+                      viewBox="0 0 220 220"
+                      aria-label="Average attendance radial chart"
+                    ></svg>
+                    <div class="radial-center" id="attendanceRadialCenter">
+                      --%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid two-cols" style="margin-top: 18px">
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">CGPA Analysis</div>
+                    <div class="panel-subtitle">CGPA trend (line)</div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="chart-wrap">
+                    <svg
+                      id="cgpaLineChart"
+                      class="chart"
+                      viewBox="0 0 640 260"
+                      preserveAspectRatio="none"
+                      aria-label="CGPA analysis line chart"
+                    ></svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Semester Performance</div>
+                    <div class="panel-subtitle">SGPA progression (area)</div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="chart-wrap">
+                    <svg
+                      id="semesterAreaChart"
+                      class="chart"
+                      viewBox="0 0 640 260"
+                      preserveAspectRatio="none"
+                      aria-label="Semester performance area chart"
+                    ></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- STUDENTS VIEW -->
+          <section
+            class="view is-hidden"
+            data-view-container="students"
+            aria-label="Students view"
+          >
+            <div class="panel glass">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Student Directory</div>
+                  <div class="panel-subtitle">
+                    Search, filter, sort, and manage records
+                  </div>
+                </div>
+                <div class="panel-actions">
+                  <div class="field">
+                    <label for="sortBy">Sort</label>
+                    <div class="select">
+                      <select id="sortBy">
+                        <option value="fullName">Name</option>
+                        <option value="cgpa">CGPA</option>
+                        <option value="attendance">Attendance</option>
+                        <option value="department">Department</option>
+                        <option value="admissionYear">Admission Year</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="sortDir">Direction</label>
+                    <div class="select">
+                      <select id="sortDir">
+                        <option value="desc">High → Low</option>
+                        <option value="asc">Low → High</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    class="btn btn-ghost"
+                    id="clearFiltersBtn"
+                    type="button"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              </div>
+
+              <div class="panel-body">
+                <div class="filters grid five">
+                  <div class="field">
+                    <label for="filterDepartment">Department</label>
+                    <div class="select">
+                      <select id="filterDepartment">
+                        <option value="">All</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="filterYear">Year</label>
+                    <div class="select">
+                      <select id="filterYear">
+                        <option value="">All</option>
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="filterSemester">Semester</label>
+                    <div class="select">
+                      <select id="filterSemester">
+                        <option value="">All</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                        <option value="3rd Semester">3rd Semester</option>
+                        <option value="4th Semester">4th Semester</option>
+                        <option value="5th Semester">5th Semester</option>
+                        <option value="6th Semester">6th Semester</option>
+                        <option value="7th Semester">7th Semester</option>
+                        <option value="8th Semester">8th Semester</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="filterCgpaMin">CGPA Min</label>
+                    <input
+                      id="filterCgpaMin"
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      placeholder="0.0"
+                    />
+                  </div>
+
+                  <div class="field">
+                    <label for="filterCgpaMax">CGPA Max</label>
+                    <input
+                      id="filterCgpaMax"
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      placeholder="10.0"
+                    />
+                  </div>
+                </div>
+
+                <div class="filters grid five" style="margin-top: 12px">
+                  <div class="field">
+                    <label for="filterAttMin">Attendance Min</label>
+                    <input
+                      id="filterAttMin"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="1"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div class="field">
+                    <label for="filterAttMax">Attendance Max</label>
+                    <input
+                      id="filterAttMax"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="1"
+                      placeholder="100"
+                    />
+                  </div>
+
+                  <div class="field">
+                    <label for="filterPlacement">Placement Status</label>
+                    <div class="select">
+                      <select id="filterPlacement">
+                        <option value="">All</option>
+                        <option value="Eligible">Eligible</option>
+                        <option value="Not Eligible">Not Eligible</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="filterInternship">Internship Status</label>
+                    <div class="select">
+                      <select id="filterInternship">
+                        <option value="">All</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Not Started">Not Started</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label>&nbsp;</label>
+                    <button
+                      class="btn btn-secondary w-100"
+                      id="applyFiltersBtn"
+                      type="button"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="toolbar">
+                  <div class="toolbar-left" id="resultsSummary">-- results</div>
+                  <div class="toolbar-right">
+                    <label class="switch">
+                      <input type="checkbox" id="compactMode" />
+                      <span class="slider"></span>
+                      <span class="switch-label">Compact</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div
+                  class="student-grid"
+                  id="studentGrid"
+                  aria-live="polite"
+                ></div>
+
+                <div class="empty-state is-hidden" id="emptyState">
+                  <div class="empty-title">
+                    No students match your criteria.
+                  </div>
+                  <div class="empty-subtitle">
+                    Try clearing filters or adjusting the search term.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ANALYTICS VIEW -->
+          <section
+            class="view is-hidden"
+            data-view-container="analytics"
+            aria-label="Analytics view"
+          >
+            <div class="grid two-cols">
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Department Distribution</div>
+                    <div class="panel-subtitle">Bar chart</div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="chart-wrap">
+                    <svg
+                      id="deptBarChart2"
+                      class="chart"
+                      viewBox="0 0 640 260"
+                      preserveAspectRatio="none"
+                    ></svg>
+                  </div>
+                </div>
+              </div>
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Year-wise Distribution</div>
+                    <div class="panel-subtitle">Bar chart</div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="chart-wrap">
+                    <svg
+                      id="yearBarChart"
+                      class="chart"
+                      viewBox="0 0 640 260"
+                      preserveAspectRatio="none"
+                    ></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid two-cols" style="margin-top: 18px">
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Top Performer</div>
+                    <div class="panel-subtitle">By CGPA</div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="top-performer" id="topPerformerCard"></div>
+                </div>
+              </div>
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Lowest Attendance Alert</div>
+                    <div class="panel-subtitle">By attendance</div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="alert-card" id="lowestAttendanceCard"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- IMPORT/EXPORT VIEW -->
+          <section
+            class="view is-hidden"
+            data-view-container="import-export"
+            aria-label="Import/Export view"
+          >
+            <div class="grid two-cols">
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Export</div>
+                    <div class="panel-subtitle">
+                      Download your student dataset
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="stack">
+
+                    <button
+                      class="btn btn-secondary"
+                      id="exportCsvBtn"
+                      type="button"
+                    >
+                      Export CSV
+                    </button>
+                    <button
+                      class="btn btn-ghost"
+                      id="exportPdfBtn"
+                      type="button"
+                    >
+                      Export PDF (print)
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="panel glass">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Import</div>
+                    <div class="panel-subtitle">
+                      Upload a JSON file or bulk paste
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="stack">
+
+
+                    <div class="field">
+                      <label for="importTextarea">Bulk JSON paste</label>
+                      <textarea
+                        id="importTextarea"
+                        rows="6"
+                        placeholder="Paste students array JSON here..."
+                      ></textarea>
+                    </div>
+
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel glass" style="margin-top: 18px">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Recent Activity Log</div>
+                  <div class="panel-subtitle">
+                    Last operations on the dataset
+                  </div>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="activity" id="activityLog"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+          <div class="loader" role="status" aria-live="polite">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Loading…</div>
+          </div>
+        </div>
+
+        <!-- TOASTS -->
+        <div
+          class="toasts"
+          id="toasts"
+          aria-live="polite"
+          aria-relevant="additions"
+        ></div>
+
+        <!-- STUDENT DRAWER -->
+        <div
+          class="drawer-backdrop is-hidden"
+          id="drawerBackdrop"
+          tabindex="-1"
+        ></div>
+        <aside
+          class="drawer is-hidden"
+          id="studentDrawer"
+          aria-label="Student details drawer"
+        >
+          <div class="drawer-header">
+            <div class="drawer-title">Student Profile</div>
+            <button
+              class="icon-btn"
+              id="drawerCloseBtn"
+              type="button"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="drawer-body" id="drawerBody">
+            <!-- populated by JS -->
+          </div>
+        </aside>
+
+        <!-- CREATE/EDIT MODAL -->
+        <div class="modal-backdrop is-hidden" id="modalBackdrop"></div>
+        <div
+          class="modal is-hidden"
+          id="studentModal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="studentModalTitle"
+        >
+          <div class="modal-header">
+            <div>
+              <div class="modal-title" id="studentModalTitle">Add Student</div>
+              <div class="modal-subtitle">
+                All changes are saved to localStorage
+              </div>
+            </div>
+            <button
+              class="icon-btn"
+              id="modalCloseBtn"
+              type="button"
+              aria-label="Close modal"
+            >
+              ✕
+            </button>
+          </div>
+
+          <form class="modal-body" id="studentForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="fFullName">Full Name *</label>
+                <input id="fFullName" name="fullName" type="text" required />
+              </div>
+              <div class="field">
+                <label for="fRollNumber">Roll Number *</label>
+                <input
+                  id="fRollNumber"
+                  name="rollNumber"
+                  type="text"
+                  required
+                />
+                <div class="field-error" data-for="rollNumber"></div>
+              </div>
+              <div class="field">
+                <label for="fDepartment">Department *</label>
+                <div class="select">
+                  <select id="fDepartment" name="department" required></select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fYear">Year *</label>
+                <div class="select">
+                  <select id="fYear" name="year" required>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fSemester">Semester *</label>
+                <div class="select">
+                  <select id="fSemester" name="semester" required>
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                    <option value="3rd Semester">3rd Semester</option>
+                    <option value="4th Semester">4th Semester</option>
+                    <option value="5th Semester">5th Semester</option>
+                    <option value="6th Semester">6th Semester</option>
+                    <option value="7th Semester">7th Semester</option>
+                    <option value="8th Semester">8th Semester</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="fEmail">Email *</label>
+                <input id="fEmail" name="email" type="email" required />
+              </div>
+              <div class="field">
+                <label for="fPhone">Phone (10 digits) *</label>
+                <input
+                  id="fPhone"
+                  name="phone"
+                  type="tel"
+                  inputmode="numeric"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="fGender">Gender</label>
+                <div class="select">
+                  <select id="fGender" name="gender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fDob">Date of Birth</label>
+                <input id="fDob" name="dateOfBirth" type="date" />
+              </div>
+              <div class="field">
+                <label for="fAddress">Address</label>
+                <input id="fAddress" name="address" type="text" />
+              </div>
+              <div class="field">
+                <label for="fBloodGroup">Blood Group</label>
+                <input id="fBloodGroup" name="bloodGroup" type="text" />
+              </div>
+
+              <div class="field">
+                <label for="fGuardianName">Guardian Name</label>
+                <input id="fGuardianName" name="guardianName" type="text" />
+              </div>
+              <div class="field">
+                <label for="fGuardianPhone">Guardian Phone</label>
+                <input
+                  id="fGuardianPhone"
+                  name="guardianPhone"
+                  type="tel"
+                  inputmode="numeric"
+                />
+              </div>
+
+              <div class="field">
+                <label for="fAdmissionYear">Admission Year</label>
+                <input
+                  id="fAdmissionYear"
+                  name="admissionYear"
+                  type="number"
+                  min="2000"
+                  max="2100"
+                />
+              </div>
+
+              <div class="field">
+                <label for="fCgpa">CGPA (0–10)</label>
+                <input
+                  id="fCgpa"
+                  name="cgpa"
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="0.01"
+                />
+              </div>
+              <div class="field">
+                <label for="fAttendance">Attendance % (0–100)</label>
+                <input
+                  id="fAttendance"
+                  name="attendance"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                />
+              </div>
+
+              <div class="field">
+                <label for="fPlacementStatus">Placement Status</label>
+                <div class="select">
+                  <select id="fPlacementStatus" name="placementStatus">
+                    <option value="Eligible">Eligible</option>
+                    <option value="Not Eligible">Not Eligible</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="fInternshipStatus">Internship Status</label>
+                <div class="select">
+                  <select id="fInternshipStatus" name="internshipStatus">
+                    <option value="Completed">Completed</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Not Started">Not Started</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="fSkills">Skills (comma separated)</label>
+                <input id="fSkills" name="skills" type="text" />
+              </div>
+
+              <div class="field">
+                <label for="fCertifications"
+                  >Certifications (comma separated)</label
+                >
+                <input id="fCertifications" name="certifications" type="text" />
+              </div>
+
+              <div class="field field-span-2">
+                <label for="fRemarks">Remarks</label>
+                <input id="fRemarks" name="remarks" type="text" />
+              </div>
+
+              <div class="field field-span-2">
+                <label for="fAvatar">Avatar URL</label>
+                <input
+                  id="fAvatar"
+                  name="avatar"
+                  type="text"
+                  placeholder="optional"
+                />
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="modal-actions">
+              <button class="btn btn-ghost" id="cancelBtn" type="button">
+                Cancel
+              </button>
+              <button
+                class="btn btn-primary"
+                id="submitStudentBtn"
+                type="submit"
+              >
+                Save Student
+              </button>
+            </div>
+
+            <div class="muted small">
+              Note: Subject marks, projects, and semester results will be
+              auto-generated for new students. Edit those fields from the
+              profile drawer after creation.
+            </div>
+          </form>
+        </div>
+
+        <!-- DELETE CONFIRM MODAL -->
+        <div class="modal-backdrop is-hidden" id="confirmBackdrop"></div>
+        <div
+          class="modal is-hidden"
+          id="confirmModal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirmModalTitle"
+        >
+          <div class="modal-header">
+            <div>
+              <div class="modal-title" id="confirmModalTitle">
+                Confirm Deletion
+              </div>
+              <div class="modal-subtitle">This action cannot be undone</div>
+            </div>
+            <button
+              class="icon-btn"
+              id="confirmCloseBtn"
+              type="button"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="confirm-text" id="confirmText">Are you sure?</div>
+            <div class="modal-actions">
+              <button class="btn btn-ghost" id="confirmCancelBtn" type="button">
+                Cancel
+              </button>
+              <button
+                class="btn btn-danger"
+                id="confirmDeleteBtn"
+                type="button"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
